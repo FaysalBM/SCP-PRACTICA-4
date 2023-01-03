@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0f4a9308-ab7f-45e7-a451-40839074599f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Test/Galaxy_1000B_2000i_Double.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Galaxy_1000B_2000i_Float.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Galaxy_2000B_2000i_Double.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Galaxy_2000B_2000i_Float.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Galaxy_200B_2000i_Double.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Galaxy_200B_2000i_Float.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Output/Simulacion_1000B_2000i_Double.json.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Output/Simulacion_1000B_2000i_Float.json.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Output/Simulacion_2000B_2000i_Double.json.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Output/Simulacion_2000B_2000i_Float.json.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Output/Simulacion_200B_2000i_Double.json.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Test/Output/Simulacion_200B_2000i_Float.json.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/.attach_pid16962" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/CHANGELOG.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/resources/JOS-N-Body-Simulation.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/resources/N-body-simulation-steps.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/resources/a.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/Controller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/ExecutionMode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/ForceCalculator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/GpuChecker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/Simulation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/SimulationLogic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/exceptions/SimulationException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/exceptions/SimulationRuntimeException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/Iteration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/SimulationGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/SimulationProperties.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/CollisionCheckAP.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/NewtonGravityAP.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationAP.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationLogicAP.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationRecursiveAction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/double_precision/CollisionCheckDouble.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/double_precision/SimulationDouble.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/double_precision/SimulationLogicDouble.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/single_precision/CollisionCheckFloat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/single_precision/SimulationFloat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/single_precision/SimulationLogicFloat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/model/ImmutableSimulationObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/model/SimulationObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/model/impl/SimulationObjectImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/model/impl/TripleNumber.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/New.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/Number.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/NumberFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/NumberFactoryProxy.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/impl/ApfloatNumberFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/impl/ApfloatNumberImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/impl/DoubleNumberFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/impl/DoubleNumberImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/impl/FloatNumberFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/numbers/impl/FloatNumberImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/InitialObjectsTableModelAndListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/MainForm.form" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/MainForm.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/Visualizer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/java2dgraphics/ShapeWithColorAndText.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/java2dgraphics/VisualizationFrame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/java2dgraphics/VisualizationKeyListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/java2dgraphics/VisualizationMouseListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/java2dgraphics/VisualizationPanel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/gui/java2dgraphics/VisualizerImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/io/JsonReaderWriter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/io/ReaderWriter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/util/Utils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/main/resources/jos-icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/core/ControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/core/impl/SimulationForkJoinImplTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/core/impl/SimulationLogicImplTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/core/impl/arbitrary_precision/ElasticCollision1DTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/core/impl/arbitrary_precision/ElasticCollision2DTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/core/impl/arbitrary_precision/InelasticCollision1DTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/formulas/CommonFormulasTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/formulas/NewtonGravityTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/numbers/ArithmeticCorrectnessTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/numbers/NumberTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-master/src/test/java/info/trekto/jos/util/UtilsTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-n-body/.idea/artifacts/jos.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-n-body/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-n-body/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-n-body/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jos-n-body/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="2Jp7G2LxVhgeMlDnXkUt7Lb3pxV" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0f4a9308-ab7f-45e7-a451-40839074599f" name="Changes" comment="" />
+      <created>1672763071544</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1672763071544</updated>
+      <workItem from="1672763072669" duration="88000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+</project>
