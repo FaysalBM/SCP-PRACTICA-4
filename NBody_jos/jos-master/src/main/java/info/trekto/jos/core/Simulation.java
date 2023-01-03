@@ -25,6 +25,10 @@ public interface Simulation {
 
     ForceCalculator getForceCalculator();
 
+    int getStartCalculate();
+
+    int getFinishCalculate();
+
     void playSimulation(String absolutePath);
 
     SimulationProperties getProperties();

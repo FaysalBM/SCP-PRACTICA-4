@@ -45,12 +45,17 @@ public class SimulationAP implements Simulation {
     private List<SimulationObject> auxiliaryObjects;
     private int startVar;
     private int finishVar;
+    private int startCal;
+    private int finishCal;
     private volatile boolean collisionExists;
     private static Semaphore sem1 = new Semaphore(0);
+    private static Semaphore sem2 = new Semaphore(0);
     private static Semaphore threadsJob = new Semaphore(0);
+    private static Semaphore semFinCal = new Semaphore(0);
     private List<Thread> threads = new ArrayList<>();
+    private static List<Thread> threadsCal = new ArrayList<>();
     public SimulationAP(SimulationProperties properties) {
-        simulationLogic = new SimulationLogicAP(this);
+        simulationLogic = new SimulationLogicAP(this, sem2,threadsCal, semFinCal);
         this.properties = properties;
     }
     private Object lock = new Object();
@@ -58,6 +63,9 @@ public class SimulationAP implements Simulation {
 
     public static void cancelThreads(List<Thread> threads) {
         for (Thread thread : threads) {
+            thread.interrupt();
+        }
+        for (Thread thread : threadsCal) {
             thread.interrupt();
         }
         System.exit(-1);
@@ -82,7 +90,14 @@ public class SimulationAP implements Simulation {
         }
         return false;
     }
-
+    @Override
+    public int getStartCalculate(){
+        return startCal;
+    }
+    @Override
+    public int getFinishCalculate(){
+        return finishCal;
+    }
     public boolean duplicateIdExists(List<SimulationObject> objects) {
         Set<String> ids = new HashSet<>();
         for (SimulationObject object : objects) {
@@ -102,18 +117,33 @@ public class SimulationAP implements Simulation {
         }
         */
         //new SimulationRecursiveAction(0, objects.size(), this).compute();
-        simulationLogic.calculateAllNewValues();
         int numberOfThreads = properties.getNumberOfThreads();
         int numberOfObjects = auxiliaryObjects.size();
         int objectsPerThread = numberOfObjects / numberOfThreads;
         int objectsLeft = numberOfObjects % numberOfThreads;
-        collisionExists = false;
-
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < threadsCal.size(); i++) {
             // Calculate the number of objects for the current thread
             int start = i * objectsPerThread;
             int end = start + objectsPerThread;
-            if (i == numberOfThreads - 1) {
+            if (i == threadsCal.size() - 1) {
+                end += objectsLeft;
+            }
+            updateRangeCal(start, end);
+            // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
+            sem2.release();
+            System.out.println("Liberate a thread with "+ start +"finish: " + end);
+        }
+        System.out.println("We wait for the jobs to send that are checked");
+        semFinCal.acquire(threadsCal.size());
+        System.out.println("Collisions checked");
+
+        collisionExists = false;
+
+        for (int i = 0; i < threads.size(); i++) {
+            // Calculate the number of objects for the current thread
+            int start = i * objectsPerThread;
+            int end = start + objectsPerThread;
+            if (i == threads.size() - 1) {
                 end += objectsLeft;
             }
             updateRange(start, end);
@@ -122,7 +152,7 @@ public class SimulationAP implements Simulation {
             System.out.println("Liberate a thread with "+ start +"finish: " + end);
         }
         System.out.println("We wait for the jobs to send that are checked");
-        threadsJob.acquire(numberOfThreads);
+        threadsJob.acquire(threads.size());
         System.out.println("Collisions checked");
 
         /* If collision/s exists execute sequentially on a single thread */
@@ -140,6 +170,11 @@ public class SimulationAP implements Simulation {
         if (properties.isSaveToFile() && saveCurrentIterationToFile) {
             C.getReaderWriter().appendObjectsToFile(objects, properties, iterationCounter);
         }
+    }
+
+    private void updateRangeCal(int start, int end) {
+        startCal = start;
+        finishCal = end;
     }
 
     public void playSimulation(String inputFile) {
@@ -222,6 +257,19 @@ public class SimulationAP implements Simulation {
         for (int i = 0; i < properties.getNumberOfThreads(); i++) {
             // Calculate the number of objects for the current thread
             // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
+            if(i >= properties.getNumberOfThreads()/2){
+                Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            simulationLogic.calculateAllNewValues();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+                thread.start();
+                threadsCal.add(thread);
+            }
             CollisionCheckAP collisionCheck;
             collisionCheck = new CollisionCheckAP(startVar, finishVar, sem1, threadsJob, this);
             Thread thread = new Thread(new Runnable() {
@@ -286,7 +334,7 @@ public class SimulationAP implements Simulation {
                 C.getReaderWriter().endFile();
             }
         }
-
+        cancelThreads(threads);
         info(logger, "End of simulation. Time: " + nanoToHumanReadable(endTime - startTime));
     }
 

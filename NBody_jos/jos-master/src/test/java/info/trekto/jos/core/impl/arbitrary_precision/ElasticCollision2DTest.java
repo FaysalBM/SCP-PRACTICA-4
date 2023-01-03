@@ -38,7 +38,7 @@ public class ElasticCollision2DTest {
     @DataProvider(name = "logic_implementations")
     public static Object[][] logicImplementations() {
         return new Object[][]{
-                {new SimulationLogicAP(new SimulationAP(new SimulationProperties())), PRECISION - 2},
+                {new SimulationLogicAP(new SimulationAP(new SimulationProperties()), null, null, null), PRECISION - 2},
                 {new SimulationLogicDouble(2, 1, 0, 0, false, 1,0),
                         DOUBLE_PRECISION - 1},
                 {new SimulationLogicFloat(2, 1, 0, 0, false, 1, 0),

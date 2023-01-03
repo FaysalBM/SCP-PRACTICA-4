@@ -23,6 +23,7 @@ import info.trekto.jos.core.numbers.Number;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 import static info.trekto.jos.core.Controller.C;
 import static info.trekto.jos.core.numbers.NumberFactoryProxy.*;
@@ -34,12 +35,18 @@ import static info.trekto.jos.core.numbers.NumberFactoryProxy.*;
 public class SimulationLogicAP implements SimulationLogic {
 
     private final Simulation simulation;
-    private Thread[] th;
-    public SimulationLogicAP(Simulation simulation) {
+    public Semaphore sWait;
+    public Semaphore sFinal;
+    private List<Thread> th;
+    public SimulationLogicAP(Simulation simulation, Semaphore s, List<Thread> th, Semaphore sFinal) {
         this.simulation = simulation;
+        this.sWait = s;
+        this.th = th;
+        this.sFinal = sFinal;
     }
     public void calculateNewValues(int fromIndex, int toIndex) {
         Iterator<SimulationObject> newObjectsIterator = simulation.getAuxiliaryObjects().subList(fromIndex, toIndex).iterator();
+
         /* We should not change oldObject. We can change only newObject. */
         for (ImmutableSimulationObject oldObject : simulation.getObjects().subList(fromIndex, toIndex)) {
             SimulationObject newObject = newObjectsIterator.next();
@@ -76,7 +83,7 @@ public class SimulationLogicAP implements SimulationLogic {
              * Velocities are calculated having the accelerations of the objects at the beginning of the period,
              * and these accelerations are applied for time T. */
             newObject.setVelocity(calculateVelocity(oldObject));
-            
+
             /* Change the acceleration */
             newObject.setAcceleration(acceleration);
 
@@ -86,45 +93,17 @@ public class SimulationLogicAP implements SimulationLogic {
                 bounceFromScreenBorders(newObject);
             }
         }
+        sFinal.release();
     }
 
-    public void calculateAllNewValues() {
-        // Calculation of variables for concurrent processing
-        int numberOfObjects = simulation.getObjects().size();
-        int numberOfThreads = simulation.getProperties().getNumberOfThreads();
-        int numberOfObjectsPerThread = numberOfObjects / numberOfThreads;
-        int numberOfObjectsLeft = numberOfObjects % numberOfThreads;
 
-        List<Thread> threads = new ArrayList<Thread>();
-        for (int i = 0; i < numberOfThreads; i++) {
-            // Calculate the indexes of the objects for the current thread
-            int fromIndex = i * numberOfObjectsPerThread;
-            int toIndex = fromIndex + numberOfObjectsPerThread;
-            if (i == numberOfThreads - 1) {
-                toIndex += numberOfObjectsLeft;
-            }
-            final int fromIndexFinal = fromIndex;
-            final int toIndexFinal = toIndex;
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    calculateNewValues(fromIndexFinal, toIndexFinal);
-                }
-            });
-            // Add the thread to the Thread ArrayList and start it
-            threads.add(thread);
-            thread.start();
+    public void calculateAllNewValues() throws InterruptedException {
+        while (true) {
+            sWait.acquire();
+            calculateNewValues(simulation.getStartCalculate(), simulation.getFinishCalculate());
         }
 
-        // Wait for all threads to finish
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
-
 
     public void processCollisions(Simulation simulation) {
         boolean mergeOnCollision = simulation.getProperties().isMergeOnCollision();
