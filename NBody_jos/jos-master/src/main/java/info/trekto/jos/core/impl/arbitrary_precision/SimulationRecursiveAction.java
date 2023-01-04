@@ -24,7 +24,7 @@ class SimulationRecursiveAction {
         this.simulation = simulation;
     }
 
-    public void compute() {
+    public void compute() throws InterruptedException {
         simulation.getSimulationLogic().calculateNewValues(fromIndex, toIndex);
     }
 

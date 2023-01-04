@@ -45,21 +45,24 @@ public class SimulationAP implements Simulation {
     private List<SimulationObject> auxiliaryObjects;
     private int startVar;
     private int finishVar;
+    private int numThreads = 0;
     private int startCal;
     private int finishCal;
     private volatile boolean collisionExists;
-    private static Semaphore sem1 = new Semaphore(0);
-    private static Semaphore sem2 = new Semaphore(0);
-    private static Semaphore threadsJob = new Semaphore(0);
-    private static Semaphore semFinCal = new Semaphore(0);
+    private static final Semaphore sem1 = new Semaphore(0);
+    private static final Semaphore sem2 = new Semaphore(0);
+    public static Semaphore threadsJob = new Semaphore(0);
+    public static Semaphore semFinCal = new Semaphore(0);
+    public static Semaphore mutex = new Semaphore(0);
     private List<Thread> threads = new ArrayList<>();
     private static List<Thread> threadsCal = new ArrayList<>();
-    public SimulationAP(SimulationProperties properties) {
-        simulationLogic = new SimulationLogicAP(this, sem2,threadsCal, semFinCal);
-        this.properties = properties;
-    }
     private Object lock = new Object();
     private Object Sinc2 = new Object();
+    public SimulationAP(SimulationProperties properties) {
+        simulationLogic = new SimulationLogicAP(this, sem2,threadsCal, semFinCal, Sinc2);
+        this.properties = properties;
+    }
+
 
     public static void cancelThreads(List<Thread> threads) {
         for (Thread thread : threads) {
@@ -82,8 +85,8 @@ public class SimulationAP implements Simulation {
 
                 if (distance.compareTo(o.getRadius().add(o1.getRadius())) < 0) {
                     info(logger, String.format("Collision between object A(x:%f, y:%f, r:%f) and B(x:%f, y:%f, r:%f)",
-                                               o.getX().doubleValue(), o.getY().doubleValue(), o.getRadius().doubleValue(),
-                                               o1.getX().doubleValue(), o1.getY().doubleValue(), o1.getRadius().doubleValue()));
+                            o.getX().doubleValue(), o.getY().doubleValue(), o.getRadius().doubleValue(),
+                            o1.getX().doubleValue(), o1.getY().doubleValue(), o1.getRadius().doubleValue()));
                     return true;
                 }
             }
@@ -98,6 +101,17 @@ public class SimulationAP implements Simulation {
     public int getFinishCalculate(){
         return finishCal;
     }
+
+    @Override
+    public int getNumThreadsCol() {
+        return 0;
+    }
+
+    @Override
+    public int getNumThreadsLogic() {
+        return 0;
+    }
+
     public boolean duplicateIdExists(List<SimulationObject> objects) {
         Set<String> ids = new HashSet<>();
         for (SimulationObject object : objects) {
@@ -117,8 +131,8 @@ public class SimulationAP implements Simulation {
         }
         */
         //new SimulationRecursiveAction(0, objects.size(), this).compute();
-        int numberOfThreads = properties.getNumberOfThreads();
-        int numberOfObjects = auxiliaryObjects.size();
+        int numberOfThreads = threadsCal.size();
+        int numberOfObjects = getObjects().size();
         int objectsPerThread = numberOfObjects / numberOfThreads;
         int objectsLeft = numberOfObjects % numberOfThreads;
         for (int i = 0; i < threadsCal.size(); i++) {
@@ -128,17 +142,23 @@ public class SimulationAP implements Simulation {
             if (i == threadsCal.size() - 1) {
                 end += objectsLeft;
             }
-            updateRangeCal(start, end);
+            synchronized (Sinc2){
+                updateRangeCal(start, end);
+            }
             // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
             sem2.release();
-            System.out.println("Liberate a thread with "+ start +"finish: " + end);
+            System.out.println("Liberate a logic thread with "+ start +"finish: " + end);
         }
-        System.out.println("We wait for the jobs to send that are checked");
+        System.out.println("We wait for the logic jobs to send that are checked " + threadsCal.size());
         semFinCal.acquire(threadsCal.size());
-        System.out.println("Collisions checked");
+        System.out.println("Logic checked");
 
         collisionExists = false;
-
+        numberOfThreads = threads.size();
+        numberOfObjects = auxiliaryObjects.size();
+        objectsPerThread = numberOfObjects / numberOfThreads;
+        objectsLeft = numberOfObjects % numberOfThreads;
+        int relesed2=0;
         for (int i = 0; i < threads.size(); i++) {
             // Calculate the number of objects for the current thread
             int start = i * objectsPerThread;
@@ -146,13 +166,16 @@ public class SimulationAP implements Simulation {
             if (i == threads.size() - 1) {
                 end += objectsLeft;
             }
-            updateRange(start, end);
+            synchronized (lock){
+                updateRange(start, end);
+            }
             // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
             sem1.release();
+            relesed2++;
             System.out.println("Liberate a thread with "+ start +"finish: " + end);
         }
         System.out.println("We wait for the jobs to send that are checked");
-        threadsJob.acquire(threads.size());
+        threadsJob.acquire(relesed2);
         System.out.println("Collisions checked");
 
         /* If collision/s exists execute sequentially on a single thread */
@@ -240,42 +263,59 @@ public class SimulationAP implements Simulation {
         }
     }
     public synchronized void updateRange(int start, int finish){
-        startVar = start;
-        finishVar = finish;
+        synchronized (lock){
+            startVar = start;
+            finishVar = finish;
+        }
     }
     @Override
     public void startSimulation() throws SimulationException, InterruptedException {
         init(true);
-
         info(logger, "Start simulation...");
         C.setEndText("END.");
         long startTime = System.nanoTime();
         long previousTime = startTime;
         long previousVisualizationTime = startTime;
         long endTime;
-
-        for (int i = 0; i < properties.getNumberOfThreads(); i++) {
-            // Calculate the number of objects for the current thread
-            // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
-            if(i >= properties.getNumberOfThreads()/2){
-                Thread thread = new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            simulationLogic.calculateAllNewValues();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
-                thread.start();
-                threadsCal.add(thread);
-            }
-            CollisionCheckAP collisionCheck;
-            collisionCheck = new CollisionCheckAP(startVar, finishVar, sem1, threadsJob, this);
+        if(properties.getNumberOfThreads() == 1){
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        collisionCheck.checkAllCollisions();
+                        simulationLogic.calculateAllNewValues();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            thread.start();
+            threadsCal.add(thread);
+        }
+        for (int i = 0; i < properties.getNumberOfThreads() / 2; i++) {
+            // Calculate the number of objects for the current thread
+            // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        simulationLogic.calculateAllNewValues();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            thread.start();
+            threadsCal.add(thread);
+        }
+        for(int i = (properties.getNumberOfThreads() / 2); i < properties.getNumberOfThreads(); i++){
+            CollisionCheckAP collisionCheck;
+            collisionCheck = new CollisionCheckAP(startVar, finishVar, sem1, threadsJob,lock,  this);
+            int finalI = i;
+            int finalI1 = i;
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        while(true){
+                            collisionCheck.checkAllCollisions(finalI, properties.getNumberOfThreads());
+                        }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -297,9 +337,7 @@ public class SimulationAP implements Simulation {
                     while (C.isPaused()) {
                         Thread.sleep(PAUSE_SLEEP_MILLISECONDS);
                     }
-
                     iterationCounter = i + 1;
-
                     if (System.nanoTime() - previousTime >= NANOSECONDS_IN_ONE_SECOND * SHOW_REMAINING_INTERVAL_SECONDS) {
                         showRemainingTime(i, startTime, properties.getNumberOfIterations(), objects.size());
                         previousTime = System.nanoTime();
@@ -437,20 +475,20 @@ public class SimulationAP implements Simulation {
     public boolean isCollisionExists() {
         return collisionExists;
     }
-    
+
     public void upCollisionExists() {
         collisionExists = true;
     }
     @Override
     public int getFromIndex(){
-        synchronized (Sinc2){
+        synchronized (lock){
             return startVar;
         }
     }
 
     @Override
     public int getToIndex() {
-        synchronized (Sinc2){
+        synchronized (lock){
             return finishVar;
         }
     }

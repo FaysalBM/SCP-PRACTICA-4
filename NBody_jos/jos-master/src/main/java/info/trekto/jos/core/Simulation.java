@@ -29,6 +29,10 @@ public interface Simulation {
 
     int getFinishCalculate();
 
+    int getNumThreadsCol();
+
+    int getNumThreadsLogic();
+
     void playSimulation(String absolutePath);
 
     SimulationProperties getProperties();

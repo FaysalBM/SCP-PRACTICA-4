@@ -35,18 +35,20 @@ import static info.trekto.jos.core.numbers.NumberFactoryProxy.*;
 public class SimulationLogicAP implements SimulationLogic {
 
     private final Simulation simulation;
-    public Semaphore sWait;
-    public Semaphore sFinal;
+    private final Semaphore sWait;
+    private final Semaphore sFinal;
     private List<Thread> th;
-    public SimulationLogicAP(Simulation simulation, Semaphore s, List<Thread> th, Semaphore sFinal) {
+    private Object sinc;
+    public SimulationLogicAP(Simulation simulation, Semaphore s, List<Thread> th, Semaphore sFinal, Object sinc) {
         this.simulation = simulation;
         this.sWait = s;
         this.th = th;
         this.sFinal = sFinal;
+        this.sinc = sinc;
     }
     public void calculateNewValues(int fromIndex, int toIndex) {
         Iterator<SimulationObject> newObjectsIterator = simulation.getAuxiliaryObjects().subList(fromIndex, toIndex).iterator();
-
+        System.out.println("Logic trigerred" + simulation.getStartCalculate() + simulation.getFinishCalculate());
         /* We should not change oldObject. We can change only newObject. */
         for (ImmutableSimulationObject oldObject : simulation.getObjects().subList(fromIndex, toIndex)) {
             SimulationObject newObject = newObjectsIterator.next();
@@ -92,7 +94,9 @@ public class SimulationLogicAP implements SimulationLogic {
             if (simulation.getProperties().isBounceFromScreenBorders()) {
                 bounceFromScreenBorders(newObject);
             }
+
         }
+        System.out.println("Released one instance ");
         sFinal.release();
     }
 
@@ -100,7 +104,13 @@ public class SimulationLogicAP implements SimulationLogic {
     public void calculateAllNewValues() throws InterruptedException {
         while (true) {
             sWait.acquire();
-            calculateNewValues(simulation.getStartCalculate(), simulation.getFinishCalculate());
+            int x;
+            int y;
+            synchronized (sinc){
+                x = simulation.getStartCalculate();
+                y = simulation.getFinishCalculate();
+            }
+            calculateNewValues(x, y);
         }
 
     }
@@ -234,8 +244,8 @@ public class SimulationLogicAP implements SimulationLogic {
         Number totalMass = bigger.getMass().add(smaller.getMass());
 
         return new TripleNumber(totalImpulse.getX().divide(totalMass),
-                                totalImpulse.getY().divide(totalMass),
-                                totalImpulse.getZ().divide(totalMass));
+                totalImpulse.getY().divide(totalMass),
+                totalImpulse.getZ().divide(totalMass));
     }
 
     private void bounceFromScreenBorders(SimulationObject newObject) {
@@ -246,16 +256,16 @@ public class SimulationLogicAP implements SimulationLogic {
             if (newObject.getX().add(newObject.getRadius()).doubleValue() >= width / 2.0
                     || newObject.getX().subtract(newObject.getRadius()).doubleValue() <= -width / 2.0) {
                 TripleNumber velocity = new TripleNumber(newObject.getVelocity().getX().negate(),
-                                                      newObject.getVelocity().getY(),
-                                                      newObject.getVelocity().getZ());
+                        newObject.getVelocity().getY(),
+                        newObject.getVelocity().getZ());
                 newObject.setVelocity(velocity);
             }
 
             if (newObject.getY().add(newObject.getRadius()).doubleValue() >= height / 2.0
                     || newObject.getY().subtract(newObject.getRadius()).doubleValue() <= -height / 2.0) {
                 TripleNumber velocity = new TripleNumber(newObject.getVelocity().getX(),
-                                                      newObject.getVelocity().getY().negate(),
-                                                      newObject.getVelocity().getZ());
+                        newObject.getVelocity().getY().negate(),
+                        newObject.getVelocity().getZ());
                 newObject.setVelocity(velocity);
             }
         }
@@ -301,21 +311,21 @@ public class SimulationLogicAP implements SimulationLogic {
         Number newAccelerationZ = acceleration.getZ().add(force.getZ().divide(object.getMass()));
         return new TripleNumber(newAccelerationX, newAccelerationY, newAccelerationZ);
     }
-    
+
     public void processTwoDimensionalCollision(SimulationObject o1, SimulationObject o2, Number cor) {
         Number v1x = o1.getVelocity().getX();
         Number v1y = o1.getVelocity().getY();
         Number v2x = o2.getVelocity().getX();
         Number v2y = o2.getVelocity().getY();
-        
+
         Number o1x = o1.getX();
         Number o1y = o1.getY();
         Number o2x = o2.getX();
         Number o2y = o2.getY();
-        
+
         Number o1m = o1.getMass();
         Number o2m = o2.getMass();
-        
+
         // v'1y = v1y - 2*m2/(m1+m2) * dotProduct(o1, o2) / dotProduct(o1y, o1x, o2y, o2x) * (o1y-o2y)
         // v'2x = v2x - 2*m2/(m1+m2) * dotProduct(o2, o1) / dotProduct(o2x, o2y, o1x, o1y) * (o2x-o1x)
         // v'2y = v2y - 2*m2/(m1+m2) * dotProduct(o2, o1) / dotProduct(o2y, o2x, o1y, o1x) * (o2y-o1y)
@@ -324,7 +334,7 @@ public class SimulationLogicAP implements SimulationLogic {
         Number o1NewVelocityY = calculateVelocity(v1y, v1x, v2y, v2x, o1y, o1x, o2y, o2x, o1m, o2m, cor);
         Number o2NewVelocityX = calculateVelocity(v2x, v2y, v1x, v1y, o2x, o2y, o1x, o1y, o2m, o1m, cor);
         Number o2NewVelocityY = calculateVelocity(v2y, v2x, v1y, v1x, o2y, o2x, o1y, o1x, o2m, o1m, cor);
-        
+
         o1.setVelocity(new TripleNumber(o1NewVelocityX, o1NewVelocityY, ZERO));
         o2.setVelocity(new TripleNumber(o2NewVelocityX, o2NewVelocityY, ZERO));
     }

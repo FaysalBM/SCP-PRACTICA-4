@@ -220,6 +220,16 @@ public class SimulationFloat extends SimulationAP implements Simulation {
         info(logger, "End of simulation. Time: " + nanoToHumanReadable(endTime - startTime));
     }
 
+    @Override
+    public int getNumThreadsCol() {
+        return 0;
+    }
+
+    @Override
+    public int getNumThreadsLogic() {
+        return 0;
+    }
+
     private List<SimulationObject> convertToSimulationObjects() {
         List<SimulationObject> objects = new ArrayList<>();
         SimulationLogicFloat sl = simulationLogic;

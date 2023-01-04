@@ -18,29 +18,31 @@ class CollisionCheckAP {
     private int toIndex;
     private final Simulation simulation;
     private final Semaphore sem;
+    private final Object lock;
 
-    public CollisionCheckAP(int fromIndex, int toIndex, Semaphore sem, Semaphore ended, Simulation simulation) {
+    public CollisionCheckAP(int fromIndex, int toIndex, Semaphore sem, Semaphore ended, Object mu, Simulation simulation) {
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
         this.simulation = simulation;
         this.sem = sem;
         this.sem2 = ended;
+        this.lock = mu;
     }
 
-    public void checkAllCollisions() throws InterruptedException {
-
+    public void checkAllCollisions(int id, int max) throws InterruptedException {
         while(true){
             sem.acquire();
-            fromIndex = simulation.getFromIndex();
-            toIndex = simulation.getToIndex();
+            synchronized (lock){
+                fromIndex = simulation.getFromIndex();
+                toIndex = simulation.getToIndex();
+            }
             int x = 0;
             if (simulation.isCollisionExists()) {
                 sem2.release();
                 return;
             }
-            System.out.println("Executing, form index:" + fromIndex + "to index: "+toIndex);
+            System.out.println("Executing, form index:" + fromIndex + "to index: "+toIndex +"ID " + id);
             for (SimulationObject object : simulation.getAuxiliaryObjects().subList(fromIndex, toIndex)) {
-
                 if (simulation.isCollisionExists()) {
                     break;
                 }
