@@ -48,7 +48,7 @@ public class SimulationLogicAP implements SimulationLogic {
     }
     public void calculateNewValues(int fromIndex, int toIndex) {
         Iterator<SimulationObject> newObjectsIterator = simulation.getAuxiliaryObjects().subList(fromIndex, toIndex).iterator();
-        System.out.println("Logic trigerred" + simulation.getStartCalculate() + simulation.getFinishCalculate());
+        //rintln("Logic trigerred" + simulation.getStartCalculate() + simulation.getFinishCalculate());
         /* We should not change oldObject. We can change only newObject. */
         for (ImmutableSimulationObject oldObject : simulation.getObjects().subList(fromIndex, toIndex)) {
             SimulationObject newObject = newObjectsIterator.next();
@@ -96,7 +96,7 @@ public class SimulationLogicAP implements SimulationLogic {
             }
 
         }
-        System.out.println("Released one instance ");
+        //System.out.println("Released one instance ");
         sFinal.release();
     }
 

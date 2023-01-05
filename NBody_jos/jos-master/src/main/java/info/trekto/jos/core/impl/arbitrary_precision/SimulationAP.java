@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static info.trekto.jos.core.Controller.C;
 // import static info.trekto.jos.core.impl.arbitrary_precision.SimulationRecursiveAction.threshold;
@@ -58,6 +60,9 @@ public class SimulationAP implements Simulation {
     private static List<Thread> threadsCal = new ArrayList<>();
     private Object lock = new Object();
     private Object Sinc2 = new Object();
+    private Lock lockCon = new ReentrantLock();
+    private int actualIt = 0;
+    private List<Integer> timeComp = new ArrayList<>();
     public SimulationAP(SimulationProperties properties) {
         simulationLogic = new SimulationLogicAP(this, sem2,threadsCal, semFinCal, Sinc2);
         this.properties = properties;
@@ -121,6 +126,10 @@ public class SimulationAP implements Simulation {
         }
         return false;
     }
+    @Override
+    public int getActualIt(){
+        return actualIt;
+    }
     public void doIteration(boolean saveCurrentIterationToFile, long iterationCounter) throws InterruptedException {
         auxiliaryObjects = deepCopy(objects);
 
@@ -147,11 +156,11 @@ public class SimulationAP implements Simulation {
             }
             // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
             sem2.release();
-            System.out.println("Liberate a logic thread with "+ start +"finish: " + end);
+            //rintln("Liberate a logic thread with "+ start +"finish: " + end);
         }
-        System.out.println("We wait for the logic jobs to send that are checked " + threadsCal.size());
+        //System.out.println("We wait for the logic jobs to send that are checked " + threadsCal.size());
         semFinCal.acquire(threadsCal.size());
-        System.out.println("Logic checked");
+        //System.out.println("Logic checked");
 
         collisionExists = false;
         numberOfThreads = threads.size();
@@ -172,11 +181,11 @@ public class SimulationAP implements Simulation {
             // Create the CollisionCheckAP object, with the start and end indexes defined, and start the thread
             sem1.release();
             relesed2++;
-            System.out.println("Liberate a thread with "+ start +"finish: " + end);
+            //System.out.println("Liberate a thread with "+ start +"finish: " + end);
         }
-        System.out.println("We wait for the jobs to send that are checked");
+        //System.out.println("We wait for the jobs to send that are checked");
         threadsJob.acquire(relesed2);
-        System.out.println("Collisions checked");
+        //System.out.println("Collisions checked");
 
         /* If collision/s exists execute sequentially on a single thread */
         if (collisionExists) {

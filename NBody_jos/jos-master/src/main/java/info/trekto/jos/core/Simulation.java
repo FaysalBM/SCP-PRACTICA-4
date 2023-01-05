@@ -33,6 +33,8 @@ public interface Simulation {
 
     int getNumThreadsLogic();
 
+    int getActualIt();
+
     void playSimulation(String absolutePath);
 
     SimulationProperties getProperties();

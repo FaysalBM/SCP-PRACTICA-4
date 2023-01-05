@@ -5,10 +5,9 @@ import info.trekto.jos.core.model.SimulationObject;
 import info.trekto.jos.core.numbers.Number;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 //import static info.trekto.jos.core.impl.arbitrary_precision.SimulationRecursiveAction.threshold;
 
@@ -19,7 +18,17 @@ class CollisionCheckAP {
     private final Simulation simulation;
     private final Semaphore sem;
     private final Object lock;
-
+    private long startTime;
+    private long finishTime;
+    private long timeExec;
+    private int currentIt;
+    private ArrayList<Long> times = new ArrayList<>();
+    private ArrayList<Integer> delPart = new ArrayList<>();
+    private ArrayList<Integer> anzdPart = new ArrayList<>();
+    private ArrayList<Integer> thIds = new ArrayList<>();
+    private long id;
+    private long lastPrint = 0;
+    private final Lock idlock = new ReentrantLock();
     public CollisionCheckAP(int fromIndex, int toIndex, Semaphore sem, Semaphore ended, Object mu, Simulation simulation) {
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
@@ -28,10 +37,50 @@ class CollisionCheckAP {
         this.sem2 = ended;
         this.lock = mu;
     }
+    private void printInfo(){
+        //System.out.println("emtrp");
+        long timesAdd = times.stream()
+                .mapToLong(a -> a)
+                .sum();
+        long delParts = delPart.stream()
+                .mapToLong(a -> a)
+                .sum();
+        long anzdParts = anzdPart.stream()
+                .mapToLong(a -> a)
+                .sum();
 
-    public void checkAllCollisions(int id, int max) throws InterruptedException {
+        System.out.println(" Thread: " + id + " ns " + "Exec Time: " + timesAdd + " Deleted Particles: " + delParts + " Analized Particles: " + anzdParts);
+    }
+    private void saveStatics(){
+        times.add(timeExec);
+        if(simulation.getAuxiliaryObjects() != null)
+            delPart.add(simulation.getObjects().size() - simulation.getAuxiliaryObjects().size());
+        anzdPart.add(toIndex-fromIndex);
+        idlock.lock();
+        try{
+            thIds.add((int) id);
+        }finally {
+            idlock.unlock();
+        }
+    }
+    public void checkAllCollisions(int userid, int max) throws InterruptedException {
         while(true){
             sem.acquire();
+            startTime = System.nanoTime();
+            try{
+                idlock.lock();
+                id = userid;
+            }finally {
+                idlock.unlock();
+            }
+            if(simulation.getCurrentIterationNumber() >= currentIt){
+                saveStatics();
+                currentIt = (int) simulation.getCurrentIterationNumber();
+            }
+            if(simulation.getCurrentIterationNumber() == lastPrint + 25){
+                printInfo();
+                lastPrint = simulation.getCurrentIterationNumber();
+            }
             synchronized (lock){
                 fromIndex = simulation.getFromIndex();
                 toIndex = simulation.getToIndex();
@@ -41,7 +90,7 @@ class CollisionCheckAP {
                 sem2.release();
                 return;
             }
-            System.out.println("Executing, form index:" + fromIndex + "to index: "+toIndex +"ID " + id);
+            //System.out.println("Executing, form index:" + fromIndex + "to index: "+toIndex +"ID " + id);
             for (SimulationObject object : simulation.getAuxiliaryObjects().subList(fromIndex, toIndex)) {
                 if (simulation.isCollisionExists()) {
                     break;
@@ -59,6 +108,8 @@ class CollisionCheckAP {
                     }
                 }
             }
+            finishTime = System.nanoTime();
+            timeExec = finishTime - startTime;
             sem2.release();
         }
     }
